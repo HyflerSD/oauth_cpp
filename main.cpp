@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-
+#include <fstream>
 #define C_LENGTH 6
 
 /**
@@ -98,8 +98,34 @@ void menu()
 
 bool validate_user(const User& user)
 {
-	//check if user exits in users file
-	return true;
+	std::fstream file("a_users.txt", std::ios::in);
+	if(!file.is_open())
+	{
+		std::cerr << "Error opening file!";
+		return false;
+	}
+
+	std::string token;
+	int c = 0;
+	std::string arr[2];
+	while(file >> token)
+	{
+		if(c > 1)
+		{
+			counter++;
+			c = 0;
+			std::cout << arr[0] << arr[1] << std::endl;
+			if(user.email == arr[0] && user.password == arr[1])
+			{
+				break;
+			}
+		}
+
+		arr[c] = token;
+		c++;
+	}
+	file.close();
+	return (user.email == arr[0] && user.password == arr[1]);
 }
 
 
@@ -109,8 +135,11 @@ bool validate_user(const User& user)
 
 int main()
 {
-	std::string r[] = {"name", "123", "123456", "654321"};
-	menu();
+	User user;
+	user.email = "michael@gmail.com";
+	user.password = "12345";
+	user.id = "5";
+	std::cout << validate_user(user) << std::endl;
 	return 0;
 }
 
