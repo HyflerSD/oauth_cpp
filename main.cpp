@@ -27,15 +27,17 @@ typedef struct
 */
 typedef struct 
 {
-	std::string account_name;
 	std::string account_id;
-	std::string auth_code;
+	std::string status;
+	std::string account_name;
+	std::string auth_code; // don't need this here bro 
 	std::string auth_secret;
 
 }OauthAccount;
 
 typedef struct 
 {
+	std::string user_email;
 	std::string account_id;
 	std::string access_token;
 	std::string scope;
@@ -68,7 +70,8 @@ void print_account(OauthAccount account)
 		creds[0],
 		creds[1],
 		creds[2],
-		creds[3]
+		creds[3],
+		creds[4]
 	};
 
 	return userAccount;
@@ -96,6 +99,48 @@ void menu()
 	}while(input != "7");
 }
 
+
+std::string generate_auth_code()
+{
+	std::string alphas = "abcdefghijklmnopqrstuvwxyz";
+	std::string alphascap = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	std::string nums = "0123456789";
+
+	return "temp";
+}
+
+bool validate_client_account(const OauthAccount& user)
+{
+	std::fstream file("a_account.txt", std::ios::in);
+	if(!file.is_open())
+	{
+		std::cerr << "Error opening file!";
+		return false;
+	}
+
+	std::string token;
+	int c = 0;
+	std::string arr[2];
+	while(file >> token)
+	{
+		if(c > 1)
+		{
+			c = 0;
+			std::cout << arr[0] << arr[1] << std::endl;
+			if(user.account_id == arr[0] && user.status == "true")
+			{
+				break;
+			}
+		}
+
+		arr[c] = token;
+		c++;
+	}
+	file.close();
+	return (user.account_id == arr[0] && user.status == "true");
+}
+
+
 bool validate_user(const User& user)
 {
 	std::fstream file("a_users.txt", std::ios::in);
@@ -112,7 +157,6 @@ bool validate_user(const User& user)
 	{
 		if(c > 1)
 		{
-			counter++;
 			c = 0;
 			std::cout << arr[0] << arr[1] << std::endl;
 			if(user.email == arr[0] && user.password == arr[1])
