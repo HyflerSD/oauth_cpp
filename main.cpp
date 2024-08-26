@@ -3,6 +3,11 @@
 #include <fstream>
 #define C_LENGTH 6
 
+
+
+const redirect_uri = "someurl";
+const oauth_uri = "oauthuri";
+
 /**
  * CLIENT
 */
@@ -19,7 +24,7 @@ typedef struct
 {
 	std::string access_token;
 	std::string resource_name;
-	std::string expiry;
+	bool is_valid;
 }UserTokens;
 
 /**
@@ -45,10 +50,31 @@ typedef struct
 
 }OauthUserTokens;
 
+
+typedef struct
+{
+	std::string client_id;
+	vector<std::string> scope;
+	//std::string callBackUrl;
+}AuthRequest;
+
+
 /**
  * RESOURCE SERVER
 */
 
+
+
+std::string get_auth_code(AuthRequest& payload)
+{
+	//Generate url to send
+	std::string* response = generate_auth_code(payload);
+	if(!response)
+	{
+		std::cout << "Error occurred somehow" << std::endl;
+	}
+	return *response;
+}
 
 
 
@@ -100,17 +126,50 @@ void menu()
 }
 
 
-std::string generate_auth_code()
+std::string* generate_auth_code(const AuthRequest& payload)
 {
-	std::string alphas = "abcdefghijklmnopqrstuvwxyz";
-	std::string alphascap = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	std::string nums = "0123456789";
-
-	return "temp";
+	if(v_auth_request(payload))
+	{
+	}
 }
 
-bool validate_client_account(const OauthAccount& user)
+void store_access_token(std::string a_token, UserToken user)
 {
+	//open user file and store token
+	std::fstream file("user_tokens.txt", std::ios::in);
+	if(!file.is_open())
+	{
+		std::cerr << "need to create user tokens files or something " << std::endl;
+	}
+
+	while(file >> token)
+	{
+		if(token == user.user_id)
+		{
+			//here update the file and return
+			return;
+		}
+	}
+	//add new user to file if you don't find them
+
+	file << user.user_id << " " << a_token << std::endl;
+	file.close();
+}
+
+
+//Maybe use a void** to take in either a ouathAccount or a request and like that stufff..
+bool v_auth_request(const void** user, std::string flag)
+{
+
+	switch(flag)
+	{
+		case "code":
+		break;
+		case "account":
+		break;
+		default:
+			return false;
+	}
 	std::fstream file("a_account.txt", std::ios::in);
 	if(!file.is_open())
 	{
