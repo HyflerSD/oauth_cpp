@@ -14,10 +14,30 @@
  *
 */
 
-std::string* generate_auth_code(const int payload);
-void store_access_token(std::string a_token, int user);
-bool v_auth_request(const void** user, std::string flag);
-bool validate_client(const User& user);
+AuthSever();
+//auth user first
+bool authorize_user(const User& user)
+{
+	return false;
+}
+//then auth the client
+bool authorize_client(const std::string client_id, const std::string client_secret, const std::string scopes)
+{
+	return false;
+}
+
+std::string generate_auth_code(const OauthClient client, const User user)
+{
+	return " ";
+}
+void store_access_token(std::map<std::string, std::string>& payload)
+{
+	return;
+}
+void revoke_access(int client_id)
+{
+	return;
+}
 
 
 
