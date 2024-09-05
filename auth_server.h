@@ -1,6 +1,10 @@
+#ifndef _AUTH_SERVER_
+#define _AUTH_SERVER_
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <map>
 
 /**
  * validate request for auth code (check client id and scope (maybe later))
@@ -23,36 +27,57 @@ typedef struct
 
 typedef struct
 {
-	std::string access_token;
-	std::string resource_name;
-	bool is_valid;
-}UserTokens;
+	std::string client_id;
+	std::string user_id;
+	std::string scopes;
+	std::string auth_code;
+	std::string expires;
+}TempAuthCodes;
 
 typedef struct 
 {
-	std::string account_id;
+	std::string client_id;
+	std::string client_secret;
 	std::string status;
-	std::string account_name;
-	std::string auth_code; // don't need this here bro 
-	std::string auth_secret;
+	std::string scopes;
+	std::string redirect_uri;
 
-}OauthAccount;
+}OauthClient;
 
 typedef struct 
 {
-	std::string user_email;
-	std::string account_id;
+	std::string user_id;
+	std::string client_id;
 	std::string access_token;
 	std::string scope;
-	std::string expiry;
+	std::string expires;
 
 }OauthUserTokens;
 
-std::string* generate_auth_code(const int payload);
-void store_access_token(std::string a_token, int user);
-bool v_auth_request(const void** user, std::string flag);
-bool validate_client(const User& user);
+class AuthServer
+{
+	std::string host;
+	std::vector<OauthUserTokens> oauth_users;
+	std::map<int, std::vector<OauthClient>> oauth_clients;
+	std::map<int, std::vector<User>> users;
+	std::map<int, std::vector<TempAuthCodes>> temp_auth_codes;
+
+public:
+
+	AuthServer(){};
+	//auth user first
+	bool authorize_user(const User& user);
+	//then auth the client
+	bool authorize_client(const std::string client_id, const std::string client_secret, const std::string scopes);
+	std::string generate_auth_code(const OauthClient client, const User user);
+	void store_access_token(std::map<std::string, std::string>& payload);
+	void revoke_access(int client_id);
+	~AuthServer(){};
+
+};
 
 
 
 
+
+#endif
