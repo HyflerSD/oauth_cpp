@@ -10,6 +10,7 @@ const std::string oauth_uri = "oauthuri";
 int main()
 {
 	AuthServer* server = new AuthServer;
+	server->showUsers();
 	delete server;
 	return 0;
 }

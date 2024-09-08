@@ -56,16 +56,18 @@ typedef struct
 
 class AuthServer
 {
-	std::string host;
-	std::vector<OauthUserTokens> oauth_users;
-	std::map<int, std::vector<OauthClient>> oauth_clients;
-	std::map<int, std::vector<User>> users;
-	std::map<int, std::vector<TempAuthCodes>> temp_auth_codes;
 
 public:
+	std::map<int, std::vector<OauthClient>> oauth_clients;
+	std::map<std::string, User> users;
+	std::map<int, std::vector<TempAuthCodes>> temp_auth_codes;
+	std::vector<OauthUserTokens> oauth_users;
+	std::string host;
 
-	AuthServer(){};
+	AuthServer();
 	//auth user first
+	void createUsers(std::ifstream* file);
+	void showUsers();
 	bool authorize_user(const User& user);
 	//then auth the client
 	bool authorize_client(const std::string client_id, const std::string client_secret, const std::string scopes);
@@ -75,9 +77,5 @@ public:
 	~AuthServer(){};
 
 };
-
-
-
-
 
 #endif
