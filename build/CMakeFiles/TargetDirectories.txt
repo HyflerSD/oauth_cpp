@@ -1,3 +1,0 @@
-/home/michael/Projects/C++/oauth_cpp/build/CMakeFiles/rebuild_cache.dir
-/home/michael/Projects/C++/oauth_cpp/build/CMakeFiles/edit_cache.dir
-/home/michael/Projects/C++/oauth_cpp/build/CMakeFiles/oauth_cpp.dir
