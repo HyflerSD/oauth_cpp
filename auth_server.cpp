@@ -17,15 +17,8 @@
 
 AuthServer::AuthServer()
 {
-	std::ifstream file("../users.txt");
-	if(!file.is_open())
-	{
-		std::cerr << "User file does not exit";
-	}
-
-	createUsers(&file);
-	file.close();
-
+	createUsers();
+	createOauthClients();
 }
 
 void AuthServer::showUsers()
@@ -38,18 +31,25 @@ void AuthServer::showUsers()
 	}
 }
 
-void AuthServer::createUsers(std::ifstream* file)
+void AuthServer::createUsers()
 {
+	std::ifstream file("../users.txt");
+	if(!file.is_open())
+	{
+		std::cerr << "User file does not exit";
+		exit(1);
+	}
+
 	std::string line;
 	std::istringstream iss;
 	std::string token;
 
 	std::vector<std::string> wv;
 
-	while(!file->eof())
+	while(!file.eof())
 	{
-		getline(*file, line);
-		if(file->good())
+		getline(file, line);
+		if(file.good())
 		{
 			iss.clear();
 			iss.str(line);
@@ -64,33 +64,83 @@ void AuthServer::createUsers(std::ifstream* file)
 			u.email = wv[1];
 			u.password = wv[2];
 			users[wv[0]] = u;
-			wv.clear();
+		wv.clear();
 		}
 	}
-
+	file.close();
 }
 
 bool AuthServer::authorize_user(const User& user)
 {
-	std::ifstream file("users.txt");
-	if(!file.is_open())
+	if(users.find(user.id) == users.end())
 	{
-		std::cerr << "File does not exist!";
 		return false;
 	}
+	return (user.password == users[user.id].password);
+}
 
-	std::string line;
-	while(getline(file, line))
+void AuthServer::createOauthClients()
+{
+	std::ifstream file("../oauth_clients.txt");
+
+	if(!file.is_open())
 	{
-		std::cout << line;
+		std::cerr << "Error creating clients";
+		exit(1);
 	}
-	return true;
+	std::string line;
+	std::istringstream iss;
+	std::string token;
+
+	std::vector<std::string> wv;
+
+	while(!file.eof())
+	{
+		getline(file, line);
+		if(file.good())
+		{
+			iss.clear();
+			iss.str(line);
+
+			while(iss.good())
+			{
+				iss >> token;
+				wv.push_back(token);
+			}
+			OauthClient c;
+			c.client_id = wv[0];
+			c.client_secret = wv[1];
+			c.status = wv[2];
+			c.scopes = wv[3];
+			c.redirect_uri = wv[4];
+			oauth_clients[wv[0]] = c;
+			wv.clear();
+		}
+	}
+	file.close();
 
 }
 
-bool AuthServer::authorize_client(const std::string client_id, const std::string client_secret, const std::string scopes)
+bool AuthServer::authorize_client(const OauthClient& client)
 {
-	return false;
+	if(oauth_clients.find(client.client_id) == oauth_clients.end())
+	{
+		return false;
+	}
+	return (client.client_secret == oauth_clients[client.client_id].client_secret);
+}
+
+
+void AuthServer::showClients()
+{
+	for(auto& client: oauth_clients)
+	{
+		std::cout << client.second.client_id << " ";
+		std::cout << client.second.client_secret << " ";
+		std::cout << client.second.status << " ";
+		std::cout << client.second.scopes<< " ";
+		std::cout << client.second.redirect_uri << " " << std::endl;
+	}
 }
 
 std::string AuthServer::generate_auth_code(const OauthClient client, const User user)

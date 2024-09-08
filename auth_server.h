@@ -58,19 +58,22 @@ class AuthServer
 {
 
 public:
-	std::map<int, std::vector<OauthClient>> oauth_clients;
+	std::map<std::string, OauthClient> oauth_clients;
 	std::map<std::string, User> users;
-	std::map<int, std::vector<TempAuthCodes>> temp_auth_codes;
+	std::map<std::string, std::vector<TempAuthCodes>> temp_auth_codes;
 	std::vector<OauthUserTokens> oauth_users;
 	std::string host;
 
 	AuthServer();
 	//auth user first
-	void createUsers(std::ifstream* file);
+	void createUsers();
 	void showUsers();
+	void createOauthClients();
+	void showClients();
 	bool authorize_user(const User& user);
+	void createOauthClients(std::ifstream* file);
 	//then auth the client
-	bool authorize_client(const std::string client_id, const std::string client_secret, const std::string scopes);
+	bool authorize_client(const OauthClient& client);
 	std::string generate_auth_code(const OauthClient client, const User user);
 	void store_access_token(std::map<std::string, std::string>& payload);
 	void revoke_access(int client_id);
